@@ -1,0 +1,70 @@
+#include<iostream>
+#include<thread>
+#include<mutex>
+#include<semaphore.h>
+using namespace std;
+
+#define MAX 10
+
+int buffer[MAX];
+int in = 0, out = 0;
+int count = 0;
+
+sem_t empty_sem, full_sem;
+mutex mtx;
+
+void producer(int n)
+{
+    for(int i=1;i<=n;i++)
+    {
+        sem_wait(&empty_sem);
+        mtx.lock();
+
+        buffer[in] = i;
+        cout<<"Produced: "<<i<<endl;
+
+        in = (in + 1) % MAX;
+
+        mtx.unlock();
+        sem_post(&full_sem);
+    }
+}
+
+void consumer(int n)
+{
+    for(int i=1;i<=n;i++)
+    {
+        sem_wait(&full_sem);
+        mtx.lock();
+
+        int item = buffer[out];
+        cout<<"Consumed: "<<item<<endl;
+
+        out = (out + 1) % MAX;
+
+        mtx.unlock();
+        sem_post(&empty_sem);
+    }
+}
+
+int main()
+{
+    int n;
+
+    cout<<"Enter number of items to produce: ";
+    cin>>n;
+
+    sem_init(&empty_sem, 0, MAX);
+    sem_init(&full_sem, 0, 0);
+
+    thread p(producer, n);
+    thread c(consumer, n);
+
+    p.join();
+    c.join();
+
+    sem_destroy(&empty_sem);
+    sem_destroy(&full_sem);
+
+    return 0;
+}
