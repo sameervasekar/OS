@@ -23,29 +23,43 @@ int main()
 
     int time = 0;
 
-    cout<<"\nGantt Chart:\n";
+  cout<<"\nGantt Chart:\n";
 
-    for(int i=0;i<n;i++)
+int start[n];
+
+for(int i=0;i<n;i++)
+{
+    // CPU Idle Condition
+    if(time < at[i])
     {
-        // CPU Idle Condition
-        if(time < at[i])
-        {
-            cout<<"| Idle ";
-            time = at[i];
-        }
-
-        cout<<"| P"<<i+1<<" ";
-
-        time += bt[i];
-
-        ct[i] = time;
-
-        tat[i] = ct[i] - at[i];
-
-        wt[i] = tat[i] - bt[i];
+        cout<<"| Idle ";
+        time = at[i];
     }
 
-    cout<<"|\n";
+    start[i] = time;
+
+    cout<<"| P"<<i+1<<" ";
+
+    time += bt[i];
+
+    ct[i] = time;
+
+    tat[i] = ct[i] - at[i];
+
+    wt[i] = tat[i] - bt[i];
+}
+
+cout<<"|\n";
+
+// Printing timings
+cout<<start[0];
+
+for(int i=0;i<n;i++)
+{
+    cout<<setw(5)<<ct[i];
+}
+
+cout<<endl;
 
     float avgWT = 0;
     float avgTAT = 0;
